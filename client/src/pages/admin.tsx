@@ -5,9 +5,20 @@ import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/StarRating";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
+import { useIsAdmin } from "@/lib/auth";
 
 export default function Admin() {
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const isAdmin = useIsAdmin();
+
+  // Redirect to login if not authenticated
+  if (!isAdmin) {
+    setLocation("/login");
+    return null;
+  }
+
   const queryClient = useQueryClient();
 
   const { data: pendingReviews } = useQuery<Review[]>({

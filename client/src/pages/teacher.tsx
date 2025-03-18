@@ -5,20 +5,12 @@ import { ReviewForm } from "@/components/ReviewForm";
 import { Reviews } from "@/components/Reviews";
 import { StarRating } from "@/components/StarRating";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { TeacherForm } from "@/components/TeacherForm";
-import { useState } from "react";
-import { Pencil } from "lucide-react";
-import { useIsAdmin } from "@/lib/auth";
 
 export default function TeacherPage() {
   const [, params] = useRoute("/teacher/:id");
   const teacherId = parseInt(params?.id || "");
-  const [isEditing, setIsEditing] = useState(false);
-  const isAdmin = useIsAdmin();
 
   const { data: teacher } = useQuery<Teacher>({
     queryKey: [`/api/teachers/${teacherId}`],
@@ -44,40 +36,17 @@ export default function TeacherPage() {
               <AvatarImage src={teacher.imageUrl} alt={teacher.name} />
               <AvatarFallback>{teacher.name[0]}</AvatarFallback>
             </Avatar>
-            <div className="flex-1">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h1 className="text-2xl font-bold">{teacher.name}</h1>
-                  <p className="text-lg text-muted-foreground">{teacher.subject}</p>
-                  {reviews?.length ? (
-                    <div className="flex items-center gap-2 mt-2">
-                      <StarRating rating={Math.round(avgRating)} />
-                      <span className="text-muted-foreground">
-                        ({reviews.length} reviews)
-                      </span>
-                    </div>
-                  ) : null}
+            <div>
+              <h1 className="text-2xl font-bold">{teacher.name}</h1>
+              <p className="text-lg text-muted-foreground">{teacher.subject}</p>
+              {reviews?.length ? (
+                <div className="flex items-center gap-2 mt-2">
+                  <StarRating rating={Math.round(avgRating)} />
+                  <span className="text-muted-foreground">
+                    ({reviews.length} reviews)
+                  </span>
                 </div>
-                {isAdmin && (
-                  <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="icon">
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Edit Teacher Profile</DialogTitle>
-                      </DialogHeader>
-                      <TeacherForm
-                        teacherId={teacherId}
-                        defaultValues={teacher}
-                        onSuccess={() => setIsEditing(false)}
-                      />
-                    </DialogContent>
-                  </Dialog>
-                )}
-              </div>
+              ) : null}
             </div>
           </CardHeader>
           <CardContent>
