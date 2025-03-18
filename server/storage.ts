@@ -1,6 +1,8 @@
-import { 
-  type Teacher, type InsertTeacher,
-  type Review, type InsertReview
+import {
+  type Teacher,
+  type InsertTeacher,
+  type Review,
+  type InsertReview,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -32,32 +34,38 @@ export class MemStorage implements IStorage {
     // Seed with initial teachers
     const teacherData = [
       {
-        name: "Dr. Sarah Johnson",
-        subject: "Mathematics",
-        imageUrl: "https://images.unsplash.com/photo-1556157382-97eda2d62296",
-        description: "Passionate about making mathematics accessible and engaging for all students."
+        name: "Jaromír Mazal",
+        subject: "odborné předměty elektro",
+        imageUrl: "https://www.spszl.cz/wp-content/uploads/2020/08/MJ.jpg",
+        description: "Konzultace: Čtvrtek 8. vyučovací hodina",
       },
       {
         name: "Prof. Michael Chen",
         subject: "Physics",
-        imageUrl: "https://images.unsplash.com/photo-1580894732444-8ecded7900cd",
-        description: "Specializes in theoretical physics with 15 years of teaching experience."
+        imageUrl:
+          "https://images.unsplash.com/photo-1580894732444-8ecded7900cd",
+        description:
+          "Specializes in theoretical physics with 15 years of teaching experience.",
       },
       {
         name: "Ms. Emily Parker",
         subject: "English Literature",
-        imageUrl: "https://images.unsplash.com/photo-1485217988980-11786ced9454",
-        description: "Dedicated to fostering creativity and critical thinking through literature."
+        imageUrl:
+          "https://images.unsplash.com/photo-1485217988980-11786ced9454",
+        description:
+          "Dedicated to fostering creativity and critical thinking through literature.",
       },
       {
         name: "Mr. David Wilson",
         subject: "History",
-        imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
-        description: "Makes history come alive through engaging storytelling and discussions."
-      }
+        imageUrl:
+          "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
+        description:
+          "Makes history come alive through engaging storytelling and discussions.",
+      },
     ];
 
-    teacherData.forEach(teacher => this.createTeacher(teacher));
+    teacherData.forEach((teacher) => this.createTeacher(teacher));
   }
 
   async getTeachers(): Promise<Teacher[]> {
@@ -87,8 +95,9 @@ export class MemStorage implements IStorage {
   }
 
   async getReviewsForTeacher(teacherId: number): Promise<Review[]> {
-    return Array.from(this.reviews.values())
-      .filter(review => review.teacherId === teacherId && review.approved);
+    return Array.from(this.reviews.values()).filter(
+      (review) => review.teacherId === teacherId && review.approved,
+    );
   }
 
   async createReview(review: InsertReview): Promise<Review> {
@@ -108,8 +117,9 @@ export class MemStorage implements IStorage {
   }
 
   async getPendingReviews(): Promise<Review[]> {
-    return Array.from(this.reviews.values())
-      .filter(review => !review.approved);
+    return Array.from(this.reviews.values()).filter(
+      (review) => !review.approved,
+    );
   }
 }
 

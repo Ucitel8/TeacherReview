@@ -5,7 +5,7 @@ import MemoryStore from "memorystore";
 const SessionStore = MemoryStore(session);
 
 // In a real app, this would be in a database
-const ADMIN_PASSWORD = "admin123";
+const ADMIN_PASSWORD = "jahoda4";
 
 export const sessionMiddleware = session({
   secret: "your-secret-key",
