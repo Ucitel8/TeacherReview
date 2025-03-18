@@ -3,8 +3,31 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertReviewSchema, insertTeacherSchema } from "@shared/schema";
 import { z } from "zod";
+import { requireAdmin, login } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Admin authentication
+  app.post("/api/admin/login", async (req, res) => {
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+
+    const isValid = await login(password);
+    if (!isValid) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    req.session.isAdmin = true;
+    res.json({ message: "Logged in successfully" });
+  });
+
+  app.post("/api/admin/logout", (req, res) => {
+    req.session.destroy(() => {
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
   // Get all teachers
   app.get("/api/teachers", async (_req, res) => {
     const teachers = await storage.getTeachers();
@@ -26,8 +49,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(teacher);
   });
 
-  // Update teacher
-  app.patch("/api/teachers/:id", async (req, res) => {
+  // Update teacher (protected)
+  app.patch("/api/teachers/:id", requireAdmin, async (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) {
       return res.status(400).json({ message: "Invalid teacher ID" });
@@ -70,14 +93,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get pending reviews (admin)
-  app.get("/api/admin/reviews/pending", async (_req, res) => {
+  // Get pending reviews (protected)
+  app.get("/api/admin/reviews/pending", requireAdmin, async (_req, res) => {
     const reviews = await storage.getPendingReviews();
     res.json(reviews);
   });
 
-  // Approve a review (admin)
-  app.post("/api/admin/reviews/:id/approve", async (req, res) => {
+  // Approve a review (protected)
+  app.post("/api/admin/reviews/:id/approve", requireAdmin, async (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) {
       return res.status(400).json({ message: "Invalid review ID" });

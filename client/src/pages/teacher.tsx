@@ -12,11 +12,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { TeacherForm } from "@/components/TeacherForm";
 import { useState } from "react";
 import { Pencil } from "lucide-react";
+import { useIsAdmin } from "@/lib/auth";
 
 export default function TeacherPage() {
   const [, params] = useRoute("/teacher/:id");
   const teacherId = parseInt(params?.id || "");
   const [isEditing, setIsEditing] = useState(false);
+  const isAdmin = useIsAdmin();
 
   const { data: teacher } = useQuery<Teacher>({
     queryKey: [`/api/teachers/${teacherId}`],
@@ -56,23 +58,25 @@ export default function TeacherPage() {
                     </div>
                   ) : null}
                 </div>
-                <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Edit Teacher Profile</DialogTitle>
-                    </DialogHeader>
-                    <TeacherForm
-                      teacherId={teacherId}
-                      defaultValues={teacher}
-                      onSuccess={() => setIsEditing(false)}
-                    />
-                  </DialogContent>
-                </Dialog>
+                {isAdmin && (
+                  <Dialog open={isEditing} onOpenChange={setIsEditing}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="icon">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit Teacher Profile</DialogTitle>
+                      </DialogHeader>
+                      <TeacherForm
+                        teacherId={teacherId}
+                        defaultValues={teacher}
+                        onSuccess={() => setIsEditing(false)}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                )}
               </div>
             </div>
           </CardHeader>
