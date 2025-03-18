@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertReviewSchema } from "@shared/schema";
+import { insertReviewSchema, insertTeacherSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -24,6 +24,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     res.json(teacher);
+  });
+
+  // Update teacher
+  app.patch("/api/teachers/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid teacher ID" });
+    }
+
+    try {
+      const teacher = insertTeacherSchema.parse(req.body);
+      const updatedTeacher = await storage.updateTeacher(id, teacher);
+      res.json(updatedTeacher);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid teacher data" });
+      }
+      throw error;
+    }
   });
 
   // Get reviews for a teacher

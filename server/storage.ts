@@ -8,7 +8,8 @@ export interface IStorage {
   getTeachers(): Promise<Teacher[]>;
   getTeacher(id: number): Promise<Teacher | undefined>;
   createTeacher(teacher: InsertTeacher): Promise<Teacher>;
-  
+  updateTeacher(id: number, teacher: InsertTeacher): Promise<Teacher>;
+
   // Review operations
   getReviewsForTeacher(teacherId: number): Promise<Review[]>;
   createReview(review: InsertReview): Promise<Review>;
@@ -74,6 +75,17 @@ export class MemStorage implements IStorage {
     return newTeacher;
   }
 
+  async updateTeacher(id: number, teacher: InsertTeacher): Promise<Teacher> {
+    const existingTeacher = this.teachers.get(id);
+    if (!existingTeacher) {
+      throw new Error("Teacher not found");
+    }
+
+    const updatedTeacher = { ...teacher, id };
+    this.teachers.set(id, updatedTeacher);
+    return updatedTeacher;
+  }
+
   async getReviewsForTeacher(teacherId: number): Promise<Review[]> {
     return Array.from(this.reviews.values())
       .filter(review => review.teacherId === teacherId && review.approved);
@@ -89,7 +101,7 @@ export class MemStorage implements IStorage {
   async approveReview(id: number): Promise<Review> {
     const review = this.reviews.get(id);
     if (!review) throw new Error("Review not found");
-    
+
     const updatedReview = { ...review, approved: true };
     this.reviews.set(id, updatedReview);
     return updatedReview;
